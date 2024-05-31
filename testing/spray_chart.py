@@ -24,11 +24,30 @@ def filterData(df):
     df = df[df["hit_or_out"] == True]
     return df
 
+def visualizeSprayChart(df):
+
+    color_dict = {
+        'single': 'brown',
+        'double': 'green',
+        'triple': 'blue',
+        'home_run': 'black'
+
+    }
+
+
+    for event, color in color_dict.items():
+        subset = df[df['events'] == event]
+        plt.scatter(subset.hc_x, subset.hc_y, color=color, label=event, alpha=0.7)
+
+    plt.legend()
+    plt.title(f"{firstName} {lastName} Spray Chart ({start} - {stop})")
+    plt.show()
+
+
 def main():
     data = getData(firstName, lastName, start, stop)
     data = filterData(data)
-    print(data.head())
-
+    visualizeSprayChart(data)
 
 if __name__ == "__main__":
     main()
