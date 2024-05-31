@@ -12,7 +12,7 @@ stop = '2023-12-31'
 
 def getData(nameFirst, nameLast, startDate, endDate):
     player = playerid_lookup(nameLast, nameFirst)
-    player_ID = player.loc["key_mlbam"]
+    player_ID = player.loc[0, "key_mlbam"]
     data = statcast_batter(startDate, endDate, player_ID)
     return data
 
@@ -21,6 +21,7 @@ def filterData(df):
     df = df.loc[reg_season_condition]
     df = df[["hc_x", "hc_y", "events", "game_date", "launch_speed", "launch_angle"]]
     df["hit_or_out"] = (df.events == 'single') | (df.events == 'double') | (df.events == 'triple') | (df.events == 'home_run')
+    df = df[df["hit_or_out"] == True]
     return df
 
 def main():
