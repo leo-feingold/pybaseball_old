@@ -4,9 +4,11 @@ import matplotlib.pyplot as plt
 from pybaseball import playerid_lookup
 import numpy as np
 import seaborn as sns
+from matplotlib.patches import Polygon
 
-firstName = 'Anthony'
-lastName = 'Volpe'
+
+firstName = 'Aaron'
+lastName = 'Judge'
 start = '2023-01-01'
 stop = '2023-12-31'
 
@@ -25,7 +27,6 @@ def filterData(df):
     return df
 
 def visualizeSprayChart(df):
-
     color_dict = {
         'single': 'brown',
         'double': 'green',
@@ -34,10 +35,9 @@ def visualizeSprayChart(df):
 
     }
 
-
     for event, color in color_dict.items():
         subset = df[df['events'] == event]
-        plt.scatter(subset.hc_x, subset.hc_y, color=color, label=event, alpha=0.7)
+        plt.scatter(5*subset.hc_x, -5*subset.hc_y, color=color, label=event, alpha=0.7)
 
     plt.legend()
     plt.title(f"{firstName} {lastName} Spray Chart ({start} - {stop})")
