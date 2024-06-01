@@ -29,7 +29,7 @@ def filterData(df):
 
     return df
 
-def plot_stadium(df, team):
+def plotStadium(df, team):
     fig, ax = plt.subplots()
     stadium = pd.read_csv('/Users/leofeingold/Desktop/pybaseball/mlbstadiums.csv')
     team_df = stadium[stadium['team'] == team.lower()]
@@ -57,7 +57,7 @@ def plot_stadium(df, team):
 def main():
     data = getData(firstName, lastName, start, stop)
     data = filterData(data)
-    plot_stadium(data, playerTeam)
+    plotStadium(data, playerTeam)
 
 if __name__ == "__main__":
     main()
