@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from pybaseball import playerid_lookup
 import numpy as np
 import seaborn as sns
-from matplotlib.patches import Polygon
 
 
 firstName = 'Anthony'
@@ -26,7 +25,8 @@ def filterData(df):
     df = df[["home_team", "hc_x", "hc_y", "events", "game_date", "launch_speed", "launch_angle"]]
     df["hit_or_out"] = (df.events == 'single') | (df.events == 'double') | (df.events == 'triple') | (df.events == 'home_run')
     df = df[df["hit_or_out"] == True]
-    df = df[df["home_team"] == playerTeamTag]
+    # To filter only home games
+    #df = df[df["home_team"] == playerTeamTag]
 
     return df
 
@@ -52,7 +52,7 @@ def plot_stadium(df, team):
         ax.scatter(subset.hc_x, -1*subset.hc_y, color=color, label=event, alpha=0.7)
 
     ax.legend()
-    ax.set_title(f"{firstName} {lastName} Spray Chart ({start} - {stop})")
+    ax.set_title(f"{firstName} {lastName} Spray Chart ({start} - {stop}, Stadium Displayed: {playerTeamTag})")
     plt.show()
 
 def main():
