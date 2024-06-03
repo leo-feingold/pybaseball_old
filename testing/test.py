@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-dateInitial = '2024-05-24'
+dateInitial = '2024-05-26'
 dateEnd = '2024-05-27'
 
 def scrapeAndSaveData(start, end):
@@ -13,7 +13,7 @@ def scrapeAndSaveData(start, end):
 
 def main():
     data = scrapeAndSaveData(start=dateInitial, end=dateEnd)
-    print(data.home_team)
+    print(data)
 
 if __name__ == "__main__":
     main()
