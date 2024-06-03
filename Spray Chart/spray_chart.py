@@ -31,7 +31,7 @@ def filterData(df):
 
 def plotStadium(df, team):
     fig, ax = plt.subplots()
-    stadium = pd.read_csv('/Users/leofeingold/Desktop/pybaseball/mlbstadiums.csv')
+    stadium = pd.read_csv('/Users/leofeingold/Desktop/pybaseball/Spray Chart/mlbstadiums.csv')
     team_df = stadium[stadium['team'] == team.lower()]
     for i in stadium['segment'].unique():
         data = team_df[team_df['segment'] == i]
