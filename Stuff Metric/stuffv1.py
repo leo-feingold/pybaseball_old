@@ -7,13 +7,13 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 import warnings
 
-dateInitial = '2024-05-20'
-dateEnd = '2024-05-27'
+dateInitial = '2023-05-20'
+dateEnd = '2023-06-27'
 
 def scrapeData(start, end):
     # To get rid of warning in the console:
     warnings.simplefilter(action='ignore', category=FutureWarning)
-    
+
     data = statcast(start_dt = start, end_dt = end)
     return data
 
@@ -22,20 +22,20 @@ def cleanData(df):
     df = df[['release_speed', 'release_pos_x', 
         'release_pos_z','pfx_x', 
         'pfx_z', 'release_spin_rate', 'release_extension',
-        'spin_axis', 'delta_run_exp']] 
+        'spin_axis', 'estimated_ba_using_speedangle']] 
     # 'vx0','vy0', 'vz0', 'ax', 'ay', 'az', 'plate_x', 'plate_z', 
     df = df.apply(pd.to_numeric, errors='coerce')
     df = df.dropna()
     return df
 
 def splitData(df):
-    X = df.drop('delta_run_exp', axis=1)
-    y = df['delta_run_exp']
+    X = df.drop('estimated_ba_using_speedangle', axis=1)
+    y = df['estimated_ba_using_speedangle']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=42)
     return X_train, X_test, y_train, y_test
 
-def trainModel(X_train, X_test, y_train, y_test):
+def trainModel(X_train, y_train):
     model = LinearRegression()
     model.fit(X_train, y_train)
     return model
@@ -44,8 +44,8 @@ def visualizeData(X_train, y_test, y_pred):
     r2 = r2_score(y_test, y_pred)
     numSamples = X_train.shape[0]
     plt.scatter(y_test, y_pred)
-    plt.xlabel("Actual Delta Run Expectancy")
-    plt.ylabel("Predicted Delta Run Expectancy")
+    plt.xlabel("Actual xwOBA")
+    plt.ylabel("Predicted xwOBA")
     plt.title(f"Stuff+ Model: r^2 = {r2}, ({numSamples} Samples)")
     plt.show()
 
@@ -58,7 +58,7 @@ def main():
     print(f"Cleaned data shape: {data.shape}")
     X_train, X_test, y_train, y_test = splitData(data)
     print("Data split successfully.")
-    model = trainModel(X_train, X_test, y_train, y_test)
+    model = trainModel(X_train, y_train)
     print("Model trained successfully")
     y_pred = model.predict(X_test)
     print("Prediction completed successfully.")

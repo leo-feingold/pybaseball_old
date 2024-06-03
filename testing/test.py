@@ -13,7 +13,7 @@ def scrapeAndSaveData(start, end):
 
 def main():
     data = scrapeAndSaveData(start=dateInitial, end=dateEnd)
-    print(data)
+    print(data.columns)
 
 if __name__ == "__main__":
     main()
