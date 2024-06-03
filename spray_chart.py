@@ -5,10 +5,10 @@ from pybaseball import playerid_lookup
 import numpy as np
 import seaborn as sns
 
-firstName = 'Anthony'
-lastName = 'Rizzo'
-playerTeam = 'yankees'
-playerTeamTag = 'NYY'
+firstName = 'Aaron'.title()
+lastName = 'Judge'.title()
+playerTeam = 'yankees'.lower()
+playerTeamTag = 'NYY'.upper()
 start = '2023-01-01'
 stop = '2023-12-31'
 
