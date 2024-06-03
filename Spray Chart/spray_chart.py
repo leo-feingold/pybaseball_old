@@ -88,6 +88,11 @@ def plotStadiumInteractive(df, team):
             'triple': 'blue',
             'home_run': 'black'
         },
+
+        category_orders={
+            'events': ['single', 'double', 'triple', 'home_run']
+        },
+
         hover_data={
             'game_date': True,
             'launch_speed': True,
