@@ -5,11 +5,15 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
+import warnings
 
 dateInitial = '2024-05-20'
 dateEnd = '2024-05-27'
 
 def scrapeData(start, end):
+    # To get rid of warning in the console:
+    warnings.simplefilter(action='ignore', category=FutureWarning)
+    
     data = statcast(start_dt = start, end_dt = end)
     return data
 
