@@ -8,8 +8,8 @@ from pybaseball import playerid_lookup
 
 dateInitial = '2024-03-28'
 dateEnd = '2024-06-4'
-firstName = 'Anthony'.title()
-lastName = 'Volpe'.title()
+firstName = 'Aaron'.title()
+lastName = 'Judge'.title()
 
 def getData(nameFirst, nameLast, startDate, endDate):
     warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -20,20 +20,22 @@ def getData(nameFirst, nameLast, startDate, endDate):
     return data, averageBatSpeed
 
 def filterData(df, averageBatSpeed):
-    twoStrike_df = df[(df["strikes"] == 2) & (df["balls"] == 0)][['delta_run_exp', 'bat_speed', 'swing_length', 'pitch_type', 'game_date']]
+    twoStrike_df = df[(df["strikes"] == 2) & ((df["balls"] == 0) | (df["balls"] == 1))][['delta_run_exp', 'bat_speed', 'swing_length', 'pitch_type', 'game_date']]
     dfSwings = twoStrike_df.dropna(subset=['bat_speed'])
     dfTakes = twoStrike_df[twoStrike_df['bat_speed'].isnull()]
     meanRVTake = dfTakes['delta_run_exp'].mean()
-    meanRVAgroSwing = dfSwings[dfSwings['bat_speed'] >= averageBatSpeed]['delta_run_exp'].mean()
-    return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing
+    meanRVAgroSwing = dfSwings[dfSwings['bat_speed'] > averageBatSpeed]['delta_run_exp'].mean()
+    meanRVPassiveSwing = dfSwings[dfSwings['bat_speed'] < averageBatSpeed]['delta_run_exp'].mean()
+    return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing
 
-def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed):
+def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiveSwing):
     fig, axs = plt.subplots()
     axs.scatter(swings["bat_speed"], swings["delta_run_exp"], label = "Swings", color = 'green')
     axs.axhline(y=meanTake, color='blue', linestyle='--', label=f"Mean Take Run Value: ({meanTake:.3f})")
     axs.axhline(y=meanAgroSwing, color='red', linestyle='--', label=f"Mean Aggressive Swing Run Value: ({meanAgroSwing:.3f})")
     #axs.axvline(x=averageBatSpeed, color='purple', linestyle='--', label=f"Mean Bat Speed: ({averageBatSpeed:.3f})")
-    axs.axhline(y=swings["delta_run_exp"].mean(), color='black', linestyle='--', label = f'Mean Swing Run Value: ({swings["delta_run_exp"].mean():.3f})')
+    #axs.axhline(y=swings["delta_run_exp"].mean(), color='pink', linestyle='--', label = f'Mean Swing Run Value: ({swings["delta_run_exp"].mean():.3f})')
+    axs.axhline(y=meanRVPassiveSwing, color='black', linestyle='--', label=f"Mean Passive Swing Run Value: ({meanRVPassiveSwing:.3f})")
     axs.set_xlabel(f"Bat Speed")
     axs.set_ylabel(f"Delta Run Expectancy")
     axs.set_title(f"0-2 Counts: {firstName} {lastName} Passive vs Aggressive Swings")
@@ -42,10 +44,10 @@ def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed):
 
 def main():
     data, averageBatSpeed = getData(firstName, lastName, dateInitial, dateEnd)
-    swings, takes, meanRVTake, meanRVAgroSwing = filterData(data, averageBatSpeed)
+    swings, takes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing = filterData(data, averageBatSpeed)
     print(f"Swings Shape: {swings.shape}")
     print(f"Takes Shape: {takes.shape}")
-    visualizeData(swings, meanRVTake, meanRVAgroSwing, averageBatSpeed)
+    visualizeData(swings, meanRVTake, meanRVAgroSwing, averageBatSpeed, meanRVPassiveSwing)
 
 if __name__ == "__main__":
     main()
