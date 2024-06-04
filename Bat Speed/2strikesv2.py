@@ -28,7 +28,7 @@ def filterData(df, averageBatSpeed):
     meanRVPassiveSwing = dfSwings[dfSwings['bat_speed'] < averageBatSpeed]['delta_run_exp'].mean()
     return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing
 
-def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiveSwing):
+def visualizeData(swings, takes, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiveSwing):
     fig, axs = plt.subplots()
     axs.scatter(swings["bat_speed"], swings["delta_run_exp"], label = "Swings", color = 'green')
     axs.axhline(y=meanTake, color='blue', linestyle='--', label=f"Mean Take Run Value: ({meanTake:.3f})")
@@ -38,16 +38,17 @@ def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiv
     axs.axhline(y=meanRVPassiveSwing, color='black', linestyle='--', label=f"Mean Passive Swing Run Value: ({meanRVPassiveSwing:.3f})")
     axs.set_xlabel(f"Bat Speed")
     axs.set_ylabel(f"Delta Run Expectancy")
-    axs.set_title(f"0-2 Counts: {firstName} {lastName} Passive vs Aggressive Swings")
+    plt.suptitle(f"0-2 and 1-2 Counts: {firstName} {lastName} Passive vs Aggressive Swings")
+    axs.set_title(f"Average Bat Speed: {averageBatSpeed:.3f}, Number of Swings: {len(swings)}, Number of Takes: {len(takes)}")
     plt.legend()
-    plt.show()  
+    plt.show()
 
 def main():
     data, averageBatSpeed = getData(firstName, lastName, dateInitial, dateEnd)
     swings, takes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing = filterData(data, averageBatSpeed)
     print(f"Swings Shape: {swings.shape}")
     print(f"Takes Shape: {takes.shape}")
-    visualizeData(swings, meanRVTake, meanRVAgroSwing, averageBatSpeed, meanRVPassiveSwing)
+    visualizeData(swings, takes, meanRVTake, meanRVAgroSwing, averageBatSpeed, meanRVPassiveSwing)
 
 if __name__ == "__main__":
     main()
