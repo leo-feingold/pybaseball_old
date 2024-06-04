@@ -17,7 +17,6 @@ def getData(nameFirst, nameLast, startDate, endDate):
     player_ID = player.loc[0, "key_mlbam"]
     data = statcast_batter(startDate, endDate, player_ID)
     averageBatSpeed = data["bat_speed"].mean()
-    print(f"Average Bat Speed: {averageBatSpeed}")
     return data, averageBatSpeed
 
 def filterData(df, averageBatSpeed):
@@ -28,11 +27,13 @@ def filterData(df, averageBatSpeed):
     meanRVAgroSwing = dfSwings[dfSwings['bat_speed'] >= averageBatSpeed]['delta_run_exp'].mean()
     return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing
 
-def visualizeData(swings, meanTake, meanAgroSwing):
+def visualizeData(swings, meanTake, meanAgroSwing, averageBatSpeed):
     fig, axs = plt.subplots()
     axs.scatter(swings["bat_speed"], swings["delta_run_exp"], label = "Swings", color = 'green')
-    axs.axhline(y=meanTake, color='red', linestyle='--', label=f"Mean Take Run Value: ({meanTake:.3f})")
-    axs.axhline(y=meanAgroSwing, color='blue', linestyle='--', label=f"Mean Aggressive Swing Run Value: ({meanAgroSwing:.3f})")
+    axs.axhline(y=meanTake, color='blue', linestyle='--', label=f"Mean Take Run Value: ({meanTake:.3f})")
+    axs.axhline(y=meanAgroSwing, color='red', linestyle='--', label=f"Mean Aggressive Swing Run Value: ({meanAgroSwing:.3f})")
+    #axs.axvline(x=averageBatSpeed, color='purple', linestyle='--', label=f"Mean Bat Speed: ({averageBatSpeed:.3f})")
+    axs.axhline(y=swings["delta_run_exp"].mean(), color='black', linestyle='--', label = f'Mean Swing Run Value: ({swings["delta_run_exp"].mean():.3f})')
     axs.set_xlabel(f"Bat Speed")
     axs.set_ylabel(f"Delta Run Expectancy")
     axs.set_title(f"0-2 Counts: {firstName} {lastName} Passive vs Aggressive Swings")
@@ -44,7 +45,7 @@ def main():
     swings, takes, meanRVTake, meanRVAgroSwing = filterData(data, averageBatSpeed)
     print(f"Swings Shape: {swings.shape}")
     print(f"Takes Shape: {takes.shape}")
-    visualizeData(swings, meanRVTake, meanRVAgroSwing)
+    visualizeData(swings, meanRVTake, meanRVAgroSwing, averageBatSpeed)
 
 if __name__ == "__main__":
     main()
