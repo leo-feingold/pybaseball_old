@@ -135,6 +135,7 @@ def main():
     data = filterData(data)
     print("Data cleaned successfully.")
     print(f"Cleaned data shape: {data.shape}")
+    plotStadium(data, playerTeam)
     plotStadiumInteractive(data, playerTeam)
 
 if __name__ == "__main__":
