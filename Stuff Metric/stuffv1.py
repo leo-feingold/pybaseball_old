@@ -7,11 +7,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 import warnings
 
-dateInitial = '2023-05-20'
+dateInitial = '2023-06-25'
 dateEnd = '2023-06-27'
 
 def scrapeData(start, end):
-    # To get rid of warning in the console:
     warnings.simplefilter(action='ignore', category=FutureWarning)
 
     data = statcast(start_dt = start, end_dt = end)
@@ -23,7 +22,7 @@ def cleanData(df):
         'release_pos_z','pfx_x', 
         'pfx_z', 'release_spin_rate', 'release_extension',
         'spin_axis', 'estimated_ba_using_speedangle']] 
-    # 'vx0','vy0', 'vz0', 'ax', 'ay', 'az', 'plate_x', 'plate_z', 
+    # 'vx0','vy0', 'vz0', 'ax', 'ay', 'az', 'plate_x', 'plate_z', game_date, player_name, pitcher, 
     df = df.apply(pd.to_numeric, errors='coerce')
     df = df.dropna()
     return df
@@ -51,6 +50,9 @@ def visualizeData(X_train, y_test, y_pred):
 
 def main():
     data = scrapeData(start=dateInitial, end=dateEnd)
+    print(data.columns)
+
+    '''
     print("Data scraped successfully.")
     print(f"Scraped data shape: {data.shape}")
     data = cleanData(data)
@@ -63,6 +65,7 @@ def main():
     y_pred = model.predict(X_test)
     print("Prediction completed successfully.")
     visualizeData(X_train, y_test, y_pred)
+    '''
 
 if __name__ == "__main__":
     main()
