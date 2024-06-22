@@ -1,3 +1,5 @@
+# I want to add the number of strikes vs balls on taken pitches
+
 import pandas as pd 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,11 +26,12 @@ def filterData(df, averageBatSpeed):
     dfSwings = twoStrike_df.dropna(subset=['bat_speed'])
     dfTakes = twoStrike_df[twoStrike_df['bat_speed'].isnull()]
     meanRVTake = dfTakes['delta_run_exp'].mean()
+    numAgroSwings = len(dfSwings[dfSwings['bat_speed'] > averageBatSpeed])
     meanRVAgroSwing = dfSwings[dfSwings['bat_speed'] > averageBatSpeed]['delta_run_exp'].mean()
     meanRVPassiveSwing = dfSwings[dfSwings['bat_speed'] < averageBatSpeed]['delta_run_exp'].mean()
-    return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing
+    return dfSwings, dfTakes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing, numAgroSwings
 
-def visualizeData(swings, takes, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiveSwing):
+def visualizeData(swings, takes, meanTake, meanAgroSwing, averageBatSpeed, meanRVPassiveSwing, numAgroSwings):
     fig, axs = plt.subplots()
     axs.scatter(swings["bat_speed"], swings["delta_run_exp"], label = "Swings", color = 'green')
     axs.axhline(y=meanTake, color='blue', linestyle='--', label=f"Mean Take Run Value: ({meanTake:.3f})")
@@ -39,16 +42,16 @@ def visualizeData(swings, takes, meanTake, meanAgroSwing, averageBatSpeed, meanR
     axs.set_xlabel(f"Bat Speed")
     axs.set_ylabel(f"Delta Run Expectancy")
     plt.suptitle(f"0-2 and 1-2 Counts: {firstName} {lastName} Passive vs Aggressive Swings")
-    axs.set_title(f"Average Bat Speed: {averageBatSpeed:.3f}, Number of Swings: {len(swings)}, Number of Takes: {len(takes)}")
+    axs.set_title(f"Average Bat Speed: {averageBatSpeed:.3f}, Number of Swings: {len(swings)} ({numAgroSwings} Aggressive) , Number of Takes: {len(takes)}")
     plt.legend()
     plt.show()
 
 def main():
     data, averageBatSpeed = getData(firstName, lastName, dateInitial, dateEnd)
-    swings, takes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing = filterData(data, averageBatSpeed)
+    swings, takes, meanRVTake, meanRVAgroSwing, meanRVPassiveSwing, numAgroSwings = filterData(data, averageBatSpeed)
     print(f"Swings Shape: {swings.shape}")
     print(f"Takes Shape: {takes.shape}")
-    visualizeData(swings, takes, meanRVTake, meanRVAgroSwing, averageBatSpeed, meanRVPassiveSwing)
+    visualizeData(swings, takes, meanRVTake, meanRVAgroSwing, averageBatSpeed, meanRVPassiveSwing, numAgroSwings)
 
 if __name__ == "__main__":
     main()
