@@ -5,27 +5,36 @@ import matplotlib.pyplot as plt
 import warnings
 from pybaseball import cache
 cache.enable()
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score, mean_squared_error
 
-
-dateInitial = '2023-6-1'
+dateInitial = '2020-7-23'
 dateEnd = '2024-06-1'
 
 def scrapeData(start, end):
     warnings.simplefilter(action='ignore', category=FutureWarning)
-    data = statcast(start_dt = start, end_dt = end)
-    data.to_csv("2023-6-1To2024-06-1.csv")
+    print("Scraping data from {} to {}...".format(start, end))
+    data = statcast(start_dt=start, end_dt=end)
+    csv_path = f"{dateInitial}To{dateEnd}FullStatcastData.csv"
+    data.to_csv(csv_path)
+    print(f"Data scraped and saved to {csv_path}")
     return data
 
 def loadData(csv):
-    df = pd.read_csv(csv)
-    return df
+    try:
+        df = pd.read_csv(csv)
+        print(f"Data loaded from {csv}. Length: {len(df)}")
+        return df
+    except FileNotFoundError:
+        print(f"File {csv} not found.")
+        return None
 
 def sortData(df):
     # Create a count column
     df['count'] = df['balls'].astype(str) + '-' + df['strikes'].astype(str)
+
+    possible_counts = ["0-0", "0-1", "0-2", "1-0", "1-1", "1-2", "2-0", "2-1", "2-2", "3-0", "3-1", "3-2"]
+    df = df[df["count"].isin(possible_counts)]
+
+
 
     # Replace 'hit_into_play' descriptions with corresponding 'events'
     df.loc[df['description'] == 'hit_into_play', 'description'] = df['events']
@@ -50,7 +59,7 @@ def sortData(df):
     df = df[df['description'].isin(relevant_descriptions)]
 
     # Group by description and count, then calculate the mean of delta_run_exp
-    mean_delta_run_exp = df.groupby(['description', 'count'])['delta_run_exp'].mean().reset_index()
+    mean_delta_run_exp = df.groupby(['description', 'count'])['delta_run_exp'].mean().reset_index(drop=False)
     mean_delta_run_exp.columns = ['description', 'count', 'mean_delta_run_exp']
 
     return df, mean_delta_run_exp
@@ -71,59 +80,18 @@ def visualizeData(df):
     plt.tight_layout()
     plt.show()
 
-def cleanData(df): 
-    df = df[['release_speed', 'release_pos_x', 'release_pos_z', 'pfx_x', 'pfx_z', 'release_spin_rate', 'release_extension', 'spin_axis', 'mean_delta_run_exp']] 
-    # Convert all columns to numeric and drop rows with NaN values
-    df = df.apply(pd.to_numeric, errors='coerce')
-    df = df.dropna()
-    print(f"Length: {len(df)}")
-    return df
-
-def splitData(df):
-    X = df.drop('mean_delta_run_exp', axis=1)
-    y = df['mean_delta_run_exp']
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    return X_train, X_test, y_train, y_test
-
-def trainModel(X_train, y_train):
-    # Use Random Forest Regressor and perform Grid Search for hyperparameter tuning
-    param_grid = {
-        'n_estimators': [100, 200],
-        'max_depth': [None, 10, 20],
-        'min_samples_split': [2, 5],
-        'min_samples_leaf': [1, 2]
-    }
-    rf = RandomForestRegressor(random_state=42)
-    grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
-    grid_search.fit(X_train, y_train)
-    best_model = grid_search.best_estimator_
-    return best_model
-
-
-def evaluateModel(model, X_test, y_test):
-    y_pred = model.predict(X_test)
-
-    mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-
-    print(f"Mean Squared Error: {mse}")
-    print(f"R^2 Score: {r2}")
-
-    return y_pred
-
 
 def main():
-    #data = scrapeData(start=dateInitial, end=dateEnd)
-    csv = "/Users/leofeingold/Desktop/pybaseball/Stuff Metric/2023-6-1To2024-06-1.csv"
+    #df = scrapeData(start=dateInitial, end=dateEnd)
+    csv = "/Users/leofeingold/Desktop/pybaseball/2020-7-23To2024-06-1FullStatcastData.csv"
     df = loadData(csv)
     df, df_sorted = sortData(df)
-    #visualizeData(df_sorted)
+    visualizeData(df_sorted)
     good_df = mergeData(df, df_sorted)
-    cleaned_df = cleanData(good_df)
-    X_train, X_test, y_train, y_test = splitData(cleaned_df)
-    model = trainModel(X_train, y_train)
-    y_pred = evaluateModel(model, X_test, y_test)
+    print(good_df.description.unique())
+    print(good_df[["description", "count", "delta_run_exp", "mean_delta_run_exp"]].head(30))
+    print(good_df)
+    good_df.to_csv(f"stuff+_statcast_data{dateInitial}To{dateEnd}.csv")
 
 
 if __name__ == "__main__":
